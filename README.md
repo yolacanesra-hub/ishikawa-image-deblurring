@@ -56,6 +56,10 @@ The script expects the following images:
 * Random seed is fixed (rng(0))
 * Images are normalized to [0,1]
 * All parameters are defined in the main script
+  
+### Signal Processing Extension
+
+The proposed Ishikawa-type iterative framework is also implemented for one-dimensional signal enhancement and restoration. This extension demonstrates the flexibility and general applicability of the method beyond image deblurring tasks.
 
 ## Notes
 
