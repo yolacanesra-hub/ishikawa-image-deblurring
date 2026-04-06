@@ -1,18 +1,15 @@
 function create_appendix_figureA2( ...
     GT_all, Noisy_all, Proposed_all, TV_all, FISTA_all, LR_all, Wiener_all, ...
     PSNR_all, SSIM_all, selectedIdx, rowTags, zoomRects, savePath)
-% MATLAB 2016 compatible
-% Appendix Figure A2:
-% Full images + zoom patches for remaining test images
-%
-% Column order:
-% GT | Blurred | Proposed | TV | FISTA | LR | Wiener
+% MATLAB 2016a compatible
+% Appendix Figure A2
+% Full images + zoom patches
 
 colTitles = {'GT', 'Blurred', 'Proposed', 'TV', 'FISTA', 'LR', 'Wiener'};
 numRows = length(selectedIdx);
 numCols = 7;
 
-hFig = figure('Color','w','Position',[50 50 2100 950]);
+hFig = figure('Color','w','Position',[50 50 2200 1100]);
 
 for r = 1:numRows
     n = selectedIdx(r);
@@ -28,76 +25,90 @@ for r = 1:numRows
 
     imgs = {GT, BLR, PROP, TVI, FIS, LRI, WIE};
 
-    %% ===================== ROW 1: FULL IMAGES =====================
+    % ---------------- FULL IMAGES ----------------
     for c = 1:numCols
-        subplot(numRows*2, numCols, (r-1)*numCols + c);
+        ax = subplot(numRows*2, numCols, (r-1)*numCols + c);
 
-        imshow(imgs{c}, []);
-        axis off;
+        imshow(imgs{c}, [], 'Parent', ax);
+        axis(ax, 'off');
 
-        hold on;
-        rectangle('Position', rect, 'EdgeColor', 'y', 'LineWidth', 1.2);
-        hold off;
+        hold(ax, 'on');
+        rectangle('Position', rect, 'EdgeColor', 'y', 'LineWidth', 1.8, 'Parent', ax);
+        hold(ax, 'off');
 
         if r == 1
-            title(colTitles{c}, 'FontSize', 12, 'FontWeight', 'bold');
+            title(colTitles{c}, ...
+                'FontSize', 12, ...
+                'FontWeight', 'bold', ...
+                'FontName', 'Times New Roman');
         end
 
-        % Metrics only for restored results
         if c >= 3
             [ps, ss] = get_metric_pair_A2(c, n, PSNR_all, SSIM_all);
 
-            text(5, size(imgs{c},1)-15, ...
-                sprintf('%.2f dB | %.3f', ps, ss), ...
-                'Color', 'w', ...
+            text(6, size(imgs{c},1)-10, ...
+                sprintf('PSNR: %.2f dB | SSIM: %.3f', ps, ss), ...
+                'Color', 'k', ...
                 'FontSize', 8, ...
                 'FontWeight', 'bold', ...
-                'BackgroundColor', 'k', ...
+                'FontName', 'Times New Roman', ...
+                'BackgroundColor', 'w', ...
                 'Margin', 2, ...
-                'VerticalAlignment', 'bottom');
+                'VerticalAlignment', 'bottom', ...
+                'Parent', ax);
         end
 
         if c == 1
-            text(-35, size(imgs{c},1)/2, rowTags{r}, ...
-                'Rotation', 90, ...
-                'FontSize', 12, ...
+            pos = get(ax, 'Position');
+            annotation('textbox', ...
+                [pos(1)-0.035, pos(2)+pos(4)/2-0.015, 0.03, 0.03], ...
+                'String', rowTags{r}, ...
+                'EdgeColor', 'none', ...
+                'HorizontalAlignment', 'center', ...
+                'VerticalAlignment', 'middle', ...
+                'FontSize', 11, ...
                 'FontWeight', 'bold', ...
-                'HorizontalAlignment', 'center');
+                'FontName', 'Times New Roman');
         end
     end
 
-    %% ===================== ROW 2: ZOOM PATCHES =====================
+    % ---------------- ZOOM PATCHES ----------------
     for c = 1:numCols
-        subplot(numRows*2, numCols, numRows*numCols + (r-1)*numCols + c);
+        ax = subplot(numRows*2, numCols, numRows*numCols + (r-1)*numCols + c);
 
         patch = crop_patch_A2(imgs{c}, rect);
-        imshow(patch, []);
-        axis off;
+        imshow(patch, [], 'Parent', ax);
+        axis(ax, 'off');
 
         if c == 1
-            text(-20, size(patch,1)/2, 'Zoom', ...
-                'Rotation', 90, ...
-                'FontSize', 11, ...
+            pos = get(ax, 'Position');
+            annotation('textbox', ...
+                [pos(1)-0.03, pos(2)+pos(4)/2-0.012, 0.025, 0.025], ...
+                'String', 'Zoom', ...
+                'EdgeColor', 'none', ...
+                'HorizontalAlignment', 'center', ...
+                'VerticalAlignment', 'middle', ...
+                'FontSize', 10, ...
                 'FontWeight', 'bold', ...
-                'HorizontalAlignment', 'center');
+                'FontName', 'Times New Roman');
         end
     end
 end
 
-annotation('textbox', [0 0.955 1 0.04], ...
-    'String', 'Appendix Fig. A2. Additional qualitative comparisons for the remaining test images.', ...
+annotation('textbox', [0 0.955 1 0.035], ...
+    'String', 'Fig. S3. Additional qualitative comparisons for the remaining test images.', ...
     'EdgeColor', 'none', ...
     'HorizontalAlignment', 'center', ...
     'FontSize', 13, ...
-    'FontWeight', 'bold');
+    'FontWeight', 'bold', ...
+    'FontName', 'Times New Roman');
 
 set(hFig, 'PaperPositionMode', 'auto');
-print(hFig, savePath, '-dpng', '-r300');
+print(hFig, savePath, '-dpng', '-r400');
 close(hFig);
 
 end
 
-%% ============================================================
 function patch = crop_patch_A2(I, rect)
 x = round(rect(1));
 y = round(rect(2));
@@ -114,17 +125,7 @@ y2 = min(H, y + h - 1);
 patch = I(y1:y2, x1:x2);
 end
 
-%% ============================================================
 function [ps, ss] = get_metric_pair_A2(c, n, PSNR_all, SSIM_all)
-% Columns:
-% 1 GT
-% 2 Blurred
-% 3 Proposed
-% 4 TV
-% 5 FISTA
-% 6 LR
-% 7 Wiener
-
 switch c
     case 3
         ps = PSNR_all(n,1); ss = SSIM_all(n,1); % Proposed

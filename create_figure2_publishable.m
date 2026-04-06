@@ -1,12 +1,11 @@
 function create_figure2_publishable( ...
     GT_all, Noisy_all, Proposed_all, TV_all, FISTA_all, LR_all, Wiener_all, ...
     PSNR_all, SSIM_all, selectedIdx, rowTags, zoomRects, savePath)
-% MATLAB 2016 compatible publishable Figure 2
-%
+% MATLAB 2016a compatible publishable Figure 2
 % Layout:
-% Top  : Full images
-% Mid  : Zoom-in patches
-% Bottom: Difference maps
+% Row block 1: Full images
+% Row block 2: Zoom patches
+% Row block 3: Error maps
 %
 % Columns:
 % GT | Blurred | Proposed | TV | FISTA | LR | Wiener
@@ -15,7 +14,9 @@ colTitles = {'GT', 'Blurred', 'Proposed', 'TV', 'FISTA', 'LR', 'Wiener'};
 numRows = length(selectedIdx);
 numCols = 7;
 
-hFig = figure('Color','w','Position',[30 30 2100 1350]);
+hFig = figure('Color','w','Position',[30 30 2200 1400]);
+
+lastErrAx = [];
 
 for r = 1:numRows
     n = selectedIdx(r);
@@ -40,83 +41,126 @@ for r = 1:numRows
         abs(LRI  - GT), ...
         abs(WIE  - GT)};
 
-    % ===================== ROW 1: FULL IMAGES =====================
+    % ---------------- FULL IMAGES ----------------
     for c = 1:numCols
-        idx = (r-1)*numCols + c;
-        subplot(numRows*3, numCols, idx);
+        ax = subplot(numRows*3, numCols, (r-1)*numCols + c);
 
-        imshow(imgs{c}, []);
-        axis off;
+        imshow(imgs{c}, [], 'Parent', ax);
+        axis(ax, 'off');
 
-        hold on;
-        rectangle('Position', rect, 'EdgeColor', 'y', 'LineWidth', 1.2);
-        hold off;
+        hold(ax, 'on');
+        rectangle('Position', rect, 'EdgeColor', 'y', 'LineWidth', 1.8, 'Parent', ax);
+        hold(ax, 'off');
 
         if r == 1
-            title(colTitles{c}, 'FontSize', 12, 'FontWeight', 'bold');
+            title(colTitles{c}, ...
+                'FontSize', 12, ...
+                'FontWeight', 'bold', ...
+                'FontName', 'Times New Roman');
         end
 
         if c >= 3
             [ps, ss] = get_metric_pair(c, n, PSNR_all, SSIM_all);
-            text(5, size(imgs{c},1)-15, ...
-                sprintf('PSNR %.2f dB\nSSIM %.3f', ps, ss), ...
-                'Color', 'w', ...
+            text(6, size(imgs{c},1)-10, ...
+                sprintf('PSNR: %.2f dB\nSSIM: %.3f', ps, ss), ...
+                'Color', 'k', ...
                 'FontSize', 8, ...
                 'FontWeight', 'bold', ...
-                'BackgroundColor', 'k', ...
+                'FontName', 'Times New Roman', ...
+                'BackgroundColor', 'w', ...
                 'Margin', 2, ...
-                'VerticalAlignment', 'bottom');
+                'VerticalAlignment', 'bottom', ...
+                'Parent', ax);
         end
 
         if c == 1
-            text(-35, size(imgs{c},1)/2, rowTags{r}, ...
-                'Rotation', 90, ...
-                'FontSize', 12, ...
+            pos = get(ax, 'Position');
+            annotation('textbox', ...
+                [pos(1)-0.040, pos(2)+pos(4)/2-0.015, 0.035, 0.03], ...
+                'String', rowTags{r}, ...
+                'EdgeColor', 'none', ...
+                'HorizontalAlignment', 'center', ...
+                'VerticalAlignment', 'middle', ...
+                'FontSize', 11, ...
                 'FontWeight', 'bold', ...
-                'HorizontalAlignment', 'center');
+                'FontName', 'Times New Roman');
         end
     end
 
-    % ===================== ROW 2: ZOOM PATCHES =====================
+    % ---------------- ZOOM PATCHES ----------------
     for c = 1:numCols
-        idx = numRows*numCols + (r-1)*numCols + c;
-        subplot(numRows*3, numCols, idx);
+        ax = subplot(numRows*3, numCols, numRows*numCols + (r-1)*numCols + c);
 
         patch = crop_patch(imgs{c}, rect);
-        imshow(patch, []);
-        axis off;
+        imshow(patch, [], 'Parent', ax);
+        axis(ax, 'off');
 
         if c == 1
-            ylabel('Zoom', 'FontSize', 11, 'FontWeight', 'bold');
+            pos = get(ax, 'Position');
+            annotation('textbox', ...
+                [pos(1)-0.030, pos(2)+pos(4)/2-0.012, 0.025, 0.025], ...
+                'String', 'Zoom', ...
+                'EdgeColor', 'none', ...
+                'HorizontalAlignment', 'center', ...
+                'VerticalAlignment', 'middle', ...
+                'FontSize', 10, ...
+                'FontWeight', 'bold', ...
+                'FontName', 'Times New Roman');
         end
     end
 
-    % ===================== ROW 3: DIFFERENCE MAPS =====================
+    % ---------------- ERROR MAPS ----------------
     for c = 1:numCols
-        idx = 2*numRows*numCols + (r-1)*numCols + c;
-        subplot(numRows*3, numCols, idx);
+        ax = subplot(numRows*3, numCols, 2*numRows*numCols + (r-1)*numCols + c);
 
         if c == 1
-            imshow(zeros(size(GT)), []);
-            axis off;
+            imshow(zeros(size(GT)), [], 'Parent', ax);
+            axis(ax, 'off');
             text(size(GT,2)/2, size(GT,1)/2, 'N/A', ...
                 'HorizontalAlignment', 'center', ...
-                'FontSize', 12, 'FontWeight', 'bold');
+                'FontSize', 12, ...
+                'FontWeight', 'bold', ...
+                'FontName', 'Times New Roman', ...
+                'Parent', ax);
         else
-            imagesc(diffMaps{c});
-            axis image off;
-            colormap(gca, gray);
-            caxis([0 0.4]);
+            imagesc(diffMaps{c}, 'Parent', ax);
+            axis(ax, 'image');
+            axis(ax, 'off');
+            colormap(ax, gray);
+            caxis(ax, [0 0.4]);
+            lastErrAx = ax;
         end
 
         if c == 1
-            ylabel('Error Map', 'FontSize', 11, 'FontWeight', 'bold');
+            pos = get(ax, 'Position');
+            annotation('textbox', ...
+                [pos(1)-0.035, pos(2)+pos(4)/2-0.012, 0.03, 0.025], ...
+                'String', 'Error Map', ...
+                'EdgeColor', 'none', ...
+                'HorizontalAlignment', 'center', ...
+                'VerticalAlignment', 'middle', ...
+                'FontSize', 10, ...
+                'FontWeight', 'bold', ...
+                'FontName', 'Times New Roman');
         end
     end
 end
 
+if ~isempty(lastErrAx)
+    cb = colorbar('peer', lastErrAx);
+    set(cb, 'FontSize', 10, 'FontName', 'Times New Roman');
+end
+
+annotation('textbox', [0 0.965 1 0.03], ...
+    'String', 'Fig. 2. Comparative restoration results, zoomed details, and error maps.', ...
+    'EdgeColor', 'none', ...
+    'HorizontalAlignment', 'center', ...
+    'FontSize', 13, ...
+    'FontWeight', 'bold', ...
+    'FontName', 'Times New Roman');
+
 set(hFig, 'PaperPositionMode', 'auto');
-print(hFig, savePath, '-dpng', '-r300');
+print(hFig, savePath, '-dpng', '-r400');
 close(hFig);
 
 end
@@ -138,15 +182,6 @@ patch = I(y1:y2, x1:x2);
 end
 
 function [ps, ss] = get_metric_pair(c, n, PSNR_all, SSIM_all)
-% Columns:
-% 1 GT
-% 2 Blurred
-% 3 Proposed
-% 4 TV
-% 5 FISTA
-% 6 LR
-% 7 Wiener
-
 switch c
     case 3
         ps = PSNR_all(n,1); ss = SSIM_all(n,1); % Proposed

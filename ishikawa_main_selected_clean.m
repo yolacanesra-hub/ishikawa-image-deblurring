@@ -156,48 +156,51 @@ writetable(T_SSIM, fullfile(outputFolder, 'SSIM_Table.xlsx'));
 
 %% ================= BAR GRAPHS =================
 hBar1 = figure('Color','w','Position',[100 100 900 500]);
-bar(PSNR_all(validRows,:), 'LineWidth', 1.0);
+hb1 = bar(PSNR_all(validRows,:), 'LineWidth', 1.0);
 set(gca, 'XTick', 1:sum(validRows), ...
     'XTickLabel', imageLabels(validRows), ...
     'XTickLabelRotation', 45, ...
     'FontSize', 11, ...
-    'LineWidth', 1);
-legend('Proposed','Wiener','LR','TV','FISTA', ...
-    'Location','northoutside','Orientation','horizontal');
-title('PSNR Comparison','FontSize',13,'FontWeight','bold');
-ylabel('dB','FontSize',12);
+    'LineWidth', 1, ...
+    'FontName', 'Times New Roman');
+legend(hb1, {'Proposed','Wiener','LR','TV','FISTA'}, ...
+    'Location','northoutside', ...
+    'Orientation','horizontal', ...
+    'FontName','Times New Roman');
+title('PSNR Comparison','FontSize',13,'FontWeight','bold','FontName','Times New Roman');
+ylabel('dB','FontSize',12,'FontName','Times New Roman');
 grid on; box on;
 set(hBar1,'PaperPositionMode','auto');
 print(hBar1, fullfile(outputFolder, 'PSNR_BarGraph_300dpi.png'), '-dpng', '-r300');
 close(hBar1);
 
 hBar2 = figure('Color','w','Position',[100 100 900 500]);
-bar(SSIM_all(validRows,:), 'LineWidth', 1.0);
+hb2 = bar(SSIM_all(validRows,:), 'LineWidth', 1.0);
 set(gca, 'XTick', 1:sum(validRows), ...
     'XTickLabel', imageLabels(validRows), ...
     'XTickLabelRotation', 45, ...
     'FontSize', 11, ...
-    'LineWidth', 1);
-legend('Proposed','Wiener','LR','TV','FISTA', ...
-    'Location','northoutside','Orientation','horizontal');
-title('SSIM Comparison','FontSize',13,'FontWeight','bold');
-ylabel('SSIM','FontSize',12);
+    'LineWidth', 1, ...
+    'FontName', 'Times New Roman');
+legend(hb2, {'Proposed','Wiener','LR','TV','FISTA'}, ...
+    'Location','northoutside', ...
+    'Orientation','horizontal', ...
+    'FontName','Times New Roman');
+title('SSIM Comparison','FontSize',13,'FontWeight','bold','FontName','Times New Roman');
+ylabel('SSIM','FontSize',12,'FontName','Times New Roman');
 grid on; box on;
 set(hBar2,'PaperPositionMode','auto');
 print(hBar2, fullfile(outputFolder, 'SSIM_BarGraph_300dpi.png'), '-dpng', '-r300');
 close(hBar2);
 
-%% ================= FIGURE 2 (NEW - PUBLISHABLE) =================
-% Representative images: Plane, Starfish, Boats
+%% ================= FIGURE 2 =================
 selectedIdx = [2, 1, 4]; % Plane, Starfish, Boats
 rowTags = {'(A) Plane', '(B) Starfish', '(C) Boats'};
 
-% Zoom region for each selected image: [x y w h]
-% Bunlari goruntuye gore istersen sonra daha iyi ayarlayabiliriz.
 zoomRects = {
-    [120 90 60 60], ...   % Plane
-    [90 110 60 60], ...   % Starfish
-    [110 80 60 60]};      % Boats
+    [120 90 60 60], ...
+    [90 110 60 60], ...
+    [110 80 60 60]};
 
 savePathFig2 = fullfile(outputFolder, 'Figure2_NEW.png');
 
@@ -208,15 +211,13 @@ create_figure2_publishable( ...
 fprintf('Yeni Figure 2 kaydedildi: %s\n', savePathFig2);
 
 %% ================= APPENDIX FIGURE A2 =================
-% Remaining images: Woman, Pirate, Couple
 selectedIdx_A2 = [3, 5, 6]; % Woman, Pirate, Couple
 rowTags_A2 = {'(A) Woman', '(B) Pirate', '(C) Couple'};
 
-% Zoom regions: [x y w h]
 zoomRects_A2 = { ...
-    [90 80 60 60], ...    % Woman
-    [100 90 60 60], ...   % Pirate
-    [110 85 60 60]};      % Couple
+    [90 80 60 60], ...
+    [100 90 60 60], ...
+    [110 85 60 60]};
 
 savePathA2 = fullfile(outputFolder, 'Appendix_Figure_A2.png');
 
@@ -225,7 +226,8 @@ create_appendix_figureA2( ...
     PSNR_all, SSIM_all, selectedIdx_A2, rowTags_A2, zoomRects_A2, savePathA2);
 
 fprintf('Appendix Figure A2 kaydedildi: %s\n', savePathA2);
-%% ================= FIGURE 3 =================
+
+%% ================= FIGURE 3 (3D SENSITIVITY) =================
 rhoVals   = [0.2 0.4 0.6 0.8 1.0];
 sigmaVals = [0.1 0.2 0.3 0.4 0.5];
 
@@ -257,39 +259,43 @@ hFig3 = figure('Color','w','Position',[100 100 1400 600]);
 subplot(1,2,1);
 surf(SIG, RHO, sensPSNR);
 shading interp;
-colormap(jet);
-xlabel('\sigma_I','FontSize',12,'FontWeight','bold');
-ylabel('\rho','FontSize',12,'FontWeight','bold');
-zlabel('PSNR (dB)','FontSize',12,'FontWeight','bold');
-title('(A) PSNR','FontSize',13,'FontWeight','bold');
-set(gca,'FontSize',11,'LineWidth',1);
+colormap(parula);
+xlabel('\sigma_I','FontSize',12,'FontWeight','bold','FontName','Times New Roman');
+ylabel('\rho','FontSize',12,'FontWeight','bold','FontName','Times New Roman');
+zlabel('PSNR (dB)','FontSize',12,'FontWeight','bold','FontName','Times New Roman');
+title('(A) PSNR','FontSize',13,'FontWeight','bold','FontName','Times New Roman');
+set(gca,'FontSize',11,'LineWidth',1,'FontName','Times New Roman');
 grid on; box on;
 view(135,30);
-colorbar;
+cb = colorbar;
+ylabel(cb, 'PSNR (dB)', 'FontSize', 11, 'FontName', 'Times New Roman');
 hold on;
 zChosen1 = compute_psnr_manual( ...
     min(max(proposed_ishikawa_restore(noisy_plane, PSF, ...
     rho, sigmaI, tau_data, tau_reg, lambda_reg, maxIter),0),1), I_plane);
-plot3(sigmaI, rho, zChosen1, 'ko', 'MarkerSize', 8, 'LineWidth', 2);
+plot3(sigmaI, rho, zChosen1, 'kp', 'MarkerSize', 10, ...
+      'MarkerFaceColor', 'y', 'LineWidth', 1.5);
 hold off;
 
 subplot(1,2,2);
 surf(SIG, RHO, sensSSIM);
 shading interp;
-colormap(jet);
-xlabel('\sigma_I','FontSize',12,'FontWeight','bold');
-ylabel('\rho','FontSize',12,'FontWeight','bold');
-zlabel('SSIM','FontSize',12,'FontWeight','bold');
-title('(B) SSIM','FontSize',13,'FontWeight','bold');
-set(gca,'FontSize',11,'LineWidth',1);
+colormap(parula);
+xlabel('\sigma_I','FontSize',12,'FontWeight','bold','FontName','Times New Roman');
+ylabel('\rho','FontSize',12,'FontWeight','bold','FontName','Times New Roman');
+zlabel('SSIM','FontSize',12,'FontWeight','bold','FontName','Times New Roman');
+title('(B) SSIM','FontSize',13,'FontWeight','bold','FontName','Times New Roman');
+set(gca,'FontSize',11,'LineWidth',1,'FontName','Times New Roman');
 grid on; box on;
 view(135,30);
-colorbar;
+cb = colorbar;
+ylabel(cb, 'SSIM', 'FontSize', 11, 'FontName', 'Times New Roman');
 hold on;
 zChosen2 = compute_ssim_safe( ...
     min(max(proposed_ishikawa_restore(noisy_plane, PSF, ...
     rho, sigmaI, tau_data, tau_reg, lambda_reg, maxIter),0),1), I_plane);
-plot3(sigmaI, rho, zChosen2, 'ko', 'MarkerSize', 8, 'LineWidth', 2);
+plot3(sigmaI, rho, zChosen2, 'kp', 'MarkerSize', 10, ...
+      'MarkerFaceColor', 'y', 'LineWidth', 1.5);
 hold off;
 
 set(hFig3,'PaperPositionMode','auto');
@@ -353,7 +359,7 @@ for n = 1:numImages
 end
 
 fprintf('\nTum islemler tamamlandi.\n');
-fprintf('Figure 2 ve Figure 3 son haliyle olusturuldu.\n');
+fprintf('Figure 2, Figure 3 ve Appendix figürleri son haliyle olusturuldu.\n');
 fprintf('Cikti klasoru: %s\n', outputFolder);
 
 end
