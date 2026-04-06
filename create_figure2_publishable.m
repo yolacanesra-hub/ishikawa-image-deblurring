@@ -146,9 +146,13 @@ for r = 1:numRows
     end
 end
 
+% ---------------- COLORBAR ----------------
 if ~isempty(lastErrAx)
     cb = colorbar('peer', lastErrAx);
+    set(cb, 'Units', 'normalized');
+    set(cb, 'Position', [0.92 0.12 0.012 0.25]);
     set(cb, 'FontSize', 10, 'FontName', 'Times New Roman');
+    ylabel(cb, '|Error|', 'FontName', 'Times New Roman');
 end
 
 annotation('textbox', [0 0.965 1 0.03], ...
