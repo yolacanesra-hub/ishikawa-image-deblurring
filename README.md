@@ -1,6 +1,8 @@
 # Ishikawa-Type Deblurring Framework for Image and Signal Processing
 
-This repository contains MATLAB implementations of an Ishikawa-type iterative framework for image and signal deblurring. The framework is designed to handle both two-dimensional image restoration and one-dimensional signal enhancement tasks.
+This repository provides a complete and reproducible MATLAB implementation of an Ishikawa-type iterative framework for image deblurring and signal enhancement.
+
+---
 
 ## 🚀 Methods Implemented
 
@@ -12,56 +14,45 @@ The following restoration methods are implemented and compared:
 * TV-ADMM deblurring
 * FISTA-based deblurring
 
-## 🧩 Project Structure
+---
 
-The project has been modularized into multiple helper functions:
+## 📂 Project Structure
 
-* Core algorithm implementations are separated into individual `.m` files
-* A total of **multiple helper functions (13+ files)** are used
-* Main execution script:
-  `ishikawa_main_selected_clean.m`
+* `ishikawa_main_selected_clean.m` → main script
+* Helper `.m` files → algorithm components (13+ files)
+* `signal_processing/` → 1D signal experiments
+* `data/` → **numerical results used in the manuscript (IMPORTANT)**
 
-Signal-related experiments are located in:
+---
 
-* `signal_processing/`
+## 📊 Minimal Dataset (PLOS Requirement)
 
-## ⚙️ Features
+This repository includes the **minimal dataset required to reproduce all results reported in the manuscript**, including:
 
-* Motion blur + Gaussian noise simulation
-* Image and signal restoration
-* PSNR & SSIM evaluation
-* High-resolution (300 DPI) figure generation
-* Excel-based result reporting
-* Sensitivity analysis experiments
+* PSNR values used in Table 2
+* SSIM values used in Table 3
+* Iteration data used in convergence analysis (Fig. 4)
+* Numerical values used to generate all graphs and figures
 
-## 🖥️ Requirements
+All these files are located in:
 
-* MATLAB
-* Image Processing Toolbox
+```
+/data
+```
 
-## ▶️ How to Run
+These data fully support the reproducibility of the results presented in the article.
 
-1. Clone or download the repository
+---
 
-2. Ensure all `.m` files are in the same directory (or keep the provided structure)
-
-3. Open MATLAB
-
-4. Set input/output paths in:
-
-   `ishikawa_main_selected_clean.m`
-
-5. Run:
-
-   ```matlab
-   ishikawa_main_selected_clean
-   ```
-
-## 📂 Input Data
+## 📥 Input Data
 
 ### Image Dataset
 
-The following test images are expected:
+The benchmark dataset (Set12) used in this study is publicly available at:
+
+https://www.kaggle.com/datasets/leweihua/set12-231008
+
+Expected image files:
 
 * `04.png` (Starfish)
 * `06.png` (Plane)
@@ -70,45 +61,80 @@ The following test images are expected:
 * `11.png` (Pirate)
 * `12.png` (Couple)
 
-### Signal Data
+---
 
-Signal experiments are implemented in:
+## ⚙️ Features
 
-* `signal_processing/`
+* Motion blur + Gaussian noise simulation
+* Image and signal restoration
+* PSNR & SSIM evaluation
+* High-resolution (300 DPI) figure generation
+* Excel-based result reporting
+* Sensitivity analysis
 
-Users can define custom signals or use synthetic data.
+---
 
-## 📊 Output
+## ▶️ How to Run
 
-The framework produces:
+1. Clone the repository
+2. Open MATLAB
+3. Set input/output paths in:
 
-* Comparison figures (300 DPI)
-* PSNR & SSIM tables (Excel format)
-* Bar charts
-* Sensitivity analysis results
+```
+ishikawa_main_selected_clean.m
+```
+
+4. Run:
+
+```matlab
+ishikawa_main_selected_clean
+```
+
+---
 
 ## 🔁 Reproducibility
 
 * Fixed random seed: `rng(0)`
 * Input normalization: `[0,1]`
-* All parameters defined in the main script
+* All parameters explicitly defined in the main script
+* All numerical outputs stored and shared in `/data`
+
+---
 
 ## 🔬 Signal Processing Extension
 
-The Ishikawa-type framework is extended to one-dimensional signals, demonstrating its flexibility across different data modalities.
+The framework is extended to 1D signal restoration, demonstrating robustness across different data modalities.
+
+---
+
+## 📌 Data Availability Statement (PLOS)
+
+All data and code underlying the findings of this study are fully available without restriction.
+
+* Source code and numerical results:
+  https://github.com/yolacanesra-hub/ishikawa-deblurring-framework
+
+* The repository contains all numerical data required to reproduce the results (PSNR, SSIM, iteration data).
+
+* The image dataset (Set12) is publicly available from Kaggle:
+  https://www.kaggle.com/datasets/leweihua/set12-231008
+
+---
 
 ## 📝 Notes
 
-Parts of the development process were supported by AI-assisted tools (ChatGPT) for debugging and code refinement. The author is responsible for the final implementation.
+Parts of the development process were supported by AI-assisted tools. The author is responsible for the final implementation and results.
+
+---
 
 ## 📌 Citation
 
-If you use this code, please cite:
-
-Esra Yolaçan,
-*A two-step iterative framework for signal and image deblurring using G-I-Nonexpansive Mappings*,
+Esra Yolaçan
+*A two-step iterative framework for signal and image deblurring using G-I-Nonexpansive Mappings*
 PLOS ONE (under review)
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+MIT License
